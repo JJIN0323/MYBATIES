@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ohgiraffers.section01.dynamic.DynamicSqlMapper">
+    <!-- COMMENT.
+            넘겨받은 price 가 0 ~ 10000원 사이일 때, 10000~20000 사이일 때
+            20000~30000 사이일 때. 30000원 초과일 때 -->
+    <!-- if 태그 test 속성의 조건에 해당 할 때만 엘리먼트 구문 실행
+         gte(크거나 같음), gt(보다 큼), lte(작거나 같음), lt(보다 작음) 등등
+         <![CDATA[문장]]> 문장에 해당하는 공간에서는 부등호 표현이 자유롭다 -->
+    <!-- COMMENT.
+            as = 별칭설정
+            config 에서도 가능 -->
+    <resultMap id="menuResultMap" type="DTO" >
+        <id property="code" column="MENU_CODE" />
+        <result property="name" column="MENU_NAME" />
+        <result property="price" column="MENU_PRICE" />
+        <result property="categoryCode" column="CATEGORY_CODE" />
+        <result property="orderableStatus" column="ORDERABLE_STATUS" />
+    </resultMap>
+
+    <select id="selectMenuByPrice" parameterType="hashmap" resultMap="menuResultMap">
+        SELECT
+            MENU_CODE,
+            MENU_NAME,
+            MENU_PRICE,
+            CATEGORY_CODE,
+            ORDERABLE_STATUS
+        FROM
+            TBL_MENU
+        WHERE
+            ORDERABLE_STATUS='Y'
+
+        <if test="price gte 0 and price lte 10000">
+            <![CDATA[AND MENU_PRICE < #{price}]]>
+            <!-- AND MENU_PRICE &lt; #{price} -->
+        </if>
+        <if test="price gt 10000 and price lte 20000">
+            AND MENU_PRICE BETWEEN 10000 AND #{price}
+        </if>
+        <if test="price gt 20000 and price lte 30000">
+            AND MENU_PRICE BETWEEN 20000 AND #{price}
+        </if>
+        <if test="price gt 30000">
+            AND MENU_PRICE BETWEEN 30000 AND #{price}
+        </if>
+        <!-- 이쁘게 정렬 -->
+        ORDER BY MENU_CODE
+    </select>
+
+    <!-- COMMENT.
+            condition 변수에 메뉴와 카테고리를 입력 할 수 있는데,
+            메뉴로 선택을 하면, join 할 필요 없이 검색어에 해당하는 메뉴를 조회한다.
+            condition 변수에 카테고리로 선택을 하면,
+            join 해서 카테고리명에 해당하는 메뉴를 조회한다. -->
+    <select id="searchMenu" parameterType="com.ohgiraffers.common.SearchCriteria" resultMap="menuResultMap">
+        SELECT
+            H.MENU_CODE,
+            H.MENU_NAME,
+            H.CATEGORY_CODE,
+            H.ORDERABLE_STATUS
+        FROM
+            TBL_MENU H
+        <if test="condition == 'category'">
+            JOIN TBL_CATEGORY J ON (H.CATEGORY_CODE = J.CATEGORY_CODE)
+        </if>
+        WHERE H.ORDERABLE_STATUS = 'Y'
+        <if test="condition == 'name'">
+            AND H.MENU_NAME LIKE CONCAT('%', #{value}, '%')
+        </if>
+        <if test="condition == 'category'">
+            AND J.CATEGORY_NAME = #{value}
+        </if>
+        ORDER BY H.MENU_CODE
+    </select>
+    <!-- COMMENT.
+            <choose>(when/otherwise) tag : java 의 switch-case 문 역할.
+            + 사용방법
+            <choose>
+                <when test="조건">
+                    쿼리문
+                </when>
+                ... when 구문은 여러개 쓸 수 있음.
+                <otherwise>
+                    쿼리문 ( default 와 같음 )
+                </otherwise>
+            </choose>
+
+            test 속성에 부합하면 해당하는 when 구문의 쿼리를 수행한다.
+            어떠한 when 구문의 조건도 만족하지 않는다면 otherwise 구문의 쿼리을 실행한다.-->
+    <select id="searchMenuBySuperCategory" parameterType="com.ohgiraffers.common.SearchCriteria" resultMap="menuResultMap">
+        SELECT
+            *
+        FROM
+            TBL_MENU
+        WHERE
+            ORDERABLE_STATUS = 'Y'
+        <choose>
+            <when test="value == '식사'">
+                AND CATEGORY_CODE IN (4, 6, 8)
+            </when>
+            <when test="value == '음료'">
+                AND CATEGORY_CODE IN (10)
+            </when>
+            <otherwise>
+                AND CATEGORY_CODE IN (12)
+            </otherwise>
+        </choose>
+        ORDER BY MENU_CODE
+    </select>
+
+</mapper>
