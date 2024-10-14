@@ -7,6 +7,7 @@
     <properties resource="config/connection-info.properties" />
     <typeAliases>
         <typeAlias type="com.ohgiraffers.common.MenuDTO" alias="DTO" />
+        <typeAlias type="com.ohgiraffers.common.SearchCriteria" alias="Search" />
     </typeAliases>
     <environments default="dev">
         <environment id="dev">

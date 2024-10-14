@@ -17,7 +17,6 @@ private DynamicSqlMapper mapper;
 
     public void selectMenuByPrice(int price) {
         SqlSession sqlSession = getSqlSession();
-
         mapper = sqlSession.getMapper(DynamicSqlMapper.class);
 
         /* comment.
@@ -48,7 +47,6 @@ private DynamicSqlMapper mapper;
 
     public void searchMenu(SearchCriteria searchCriteria) {
         SqlSession sqlSession = getSqlSession();
-
         mapper = sqlSession.getMapper(DynamicSqlMapper.class);
 
         // 클래스로 값을 넘김.
@@ -68,7 +66,6 @@ private DynamicSqlMapper mapper;
     public void searchMenuBySuperCategory(SearchCriteria searchCriteria) {
 
         SqlSession sqlSession = getSqlSession();
-
         mapper = sqlSession.getMapper(DynamicSqlMapper.class);
 
         List<MenuDTO> menuList = mapper.searchMenuBySuperCategory(searchCriteria);
@@ -83,5 +80,80 @@ private DynamicSqlMapper mapper;
 
         sqlSession.close();
 
+    }
+
+    public void searchMenuByRandomCode(List<Integer> randomCodeList) {
+
+        SqlSession sqlSession = getSqlSession();
+        mapper = sqlSession.getMapper(DynamicSqlMapper.class);
+
+        Map<String, List<Integer>> criteria = new HashMap<>(); // 키 값은 String, List 타입으로 반환
+        // Map 형식으로 우리가 만든 5개의 랜덤코드 리스트 집어넣기
+        criteria.put("randomCodeList", randomCodeList); // 키 값, value 값
+
+        List<MenuDTO> menuList = mapper.searchMenuByRandomCode(criteria);
+
+        if(menuList != null && menuList.size() > 0) {
+            for (MenuDTO menu : menuList) {
+                System.out.println(menu);
+            }
+        } else {
+            System.out.println("검색 결과가 없습니다.");
+        }
+
+        sqlSession.close();
+
+    }
+
+    public void searchMenuByCodeOrSearchAll(SearchCriteria searchCriteria) {
+        SqlSession sqlSession = getSqlSession();
+        mapper = sqlSession.getMapper(DynamicSqlMapper.class);
+
+        List<MenuDTO> menuList = mapper.searchMenuByCodeOrSearchAll(searchCriteria);
+
+        if(menuList != null && menuList.size() > 0) {
+            for (MenuDTO menu : menuList) {
+                System.out.println(menu);
+            }
+        } else {
+            System.out.println("검색 결과가 없습니다.");
+        }
+
+        sqlSession.close();
+    }
+
+    public void searchMenuByNameOrCategory(Map<String, Object> criteria) {
+        SqlSession sqlSession = getSqlSession();
+        mapper = sqlSession.getMapper(DynamicSqlMapper.class);
+
+        List<MenuDTO> menuList = mapper.searchMenuByNameOrCategory(criteria);
+
+        if(menuList != null && menuList.size() > 0) {
+            for (MenuDTO menu : menuList) {
+                System.out.println(menu);
+            }
+        } else {
+            System.out.println("검색 결과가 없습니다.");
+        }
+
+        sqlSession.close();
+    }
+
+    public void modifyMenu(Map<String, Object> criteria) {
+        SqlSession sqlSession = getSqlSession();
+        mapper = sqlSession.getMapper(DynamicSqlMapper.class);
+
+        int result = mapper.modifyMenu(criteria);
+        System.out.println(result);
+
+        if ( result > 0 ) {
+            System.out.println("메뉴 수정이 완료되었습니다.");
+            sqlSession.commit();
+        } else {
+            System.out.println("메뉴 수정에 실패했습니다.");
+            sqlSession.rollback();
+        }
+
+        sqlSession.close();
     }
 }
