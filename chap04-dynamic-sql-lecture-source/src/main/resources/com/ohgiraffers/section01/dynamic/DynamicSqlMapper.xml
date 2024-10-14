@@ -222,7 +222,7 @@
         <!--    WHERE-->
         <!--        MENU_CODE = #{code}-->
         UPDATE
-        TBL_MENU
+            TBL_MENU
         <trim prefix="SET" prefixOverrides="," suffix="WHERE">
             <if test="name != null and name != ''">
                 MENU_NAME = #{name}
