@@ -59,9 +59,6 @@ public class Application {
                 case 4 :
                     elementService.selectResultMapCollection();
             }
-
         } while (true);
-
     }
-
 }
