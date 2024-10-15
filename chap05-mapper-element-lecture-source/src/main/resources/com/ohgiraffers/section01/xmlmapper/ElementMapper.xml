@@ -3,12 +3,12 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ohgiraffers.section01.xmlmapper.ElementMapper">
-    <!-- comment.
+    <!-- COMMENT.
             Mapper.xml 파일에서 사용할 수 있는 태그 엘리먼트는 총 9가지
             <cache>, <cache-ref>, <resultMap>, <parameterMap>,
             <sql>, <select>, <insert>, <update>, <delete>
      -->
-    <!-- comment.
+    <!-- COMMENT.
             1. eviction : 캐시 알고리즘 디폴트 설정 LRU
             2. flushInterval : 설정 된 캐시를 얼마나 유지할 지 밀리초로 설정
             3. size : 캐시에 저장 될 객체의 수. 디폴트 1024
@@ -16,10 +16,10 @@
             - 캐시란 ? 데이터나 값을 미리 복사해둔 임시의 장소를 의미한다
             - 동일한 값을 DB 에서 꺼내오는 과정을 생략하고 싶을 때 사용한다.
             - 캐시 설정은 많이 반복 될 작업에 적용하는 것이 효과적이다.
-     -->
+            - 캐시 설정에서 벗어나고 싶은 경우, useCache = false 를 사용하면 된다. -->
     <cache eviction="LRU" flushInterval="1000" size="512" readOnly="true"/>
 
-    <select id="selectCacheTest" resultType="java.lang.String">
+    <select id="selectCacheTest" resultType="java.lang.String" useCache="false">
         SELECT
             MENU_NAME
         FROM
@@ -98,20 +98,36 @@
     </select>
     <!-- COMMENT. association
                   resultMap 을 구성하는 방법
-                  1. 따로 만든 result 이용
-                  2.  -->
-    <resultMap id="categoryResultMap" type="com.ohgiraffers.common.CategoryDTO">
-        <id property="code" column="CATEGORY_CODE" />
-        <result property="name" column="CATEGORY_NAME" />
-        <result property="refCategoryCode" column="REF_CATEGORY_CODE" />
-    </resultMap>
+                  - 따로 만든 result 이용 -->
+<!--    <resultMap id="categoryResultMap" type="com.ohgiraffers.common.CategoryDTO">-->
+<!--        <id property="code" column="CATEGORY_CODE" />-->
+<!--        <result property="name" column="CATEGORY_NAME" />-->
+<!--        <result property="refCategoryCode" column="REF_CATEGORY_CODE" />-->
+<!--    </resultMap>-->
+
+<!--    <resultMap id="menuAndCategoryResultMap" type="com.ohgiraffers.common.MenuAndCategoryDTO">-->
+<!--        <id property="code" column="MENU_CODE" />-->
+<!--        <result property="name" column="MENU_NAME" />-->
+<!--        <result property="price" column="MENU_PRICE" />-->
+<!--        <result property="orderableStatus" column="ORDERABLE_STATUS" />-->
+<!--        <association property="categoryDTO" resultMap="categoryResultMap" />-->
+<!--    </resultMap>-->
+
+    <!-- COMMENT. association
+                 resultMap 을 구성하는 방법
+                 - association 내부에 id 와 result 이용 -->
 
     <resultMap id="menuAndCategoryResultMap" type="com.ohgiraffers.common.MenuAndCategoryDTO">
         <id property="code" column="MENU_CODE" />
         <result property="name" column="MENU_NAME" />
         <result property="price" column="MENU_PRICE" />
         <result property="orderableStatus" column="ORDERABLE_STATUS" />
-        <association property="categoryDTO" resultMap="categoryResultMap" />
+
+        <association property="categoryDTO" javaType="com.ohgiraffers.common.CategoryDTO">
+            <id property="code" column="CATEGORY_CODE" />
+            <result property="name" column="CATEGORY_NAME" />
+            <result property="refCategoryCode" column="REF_CATEGORY_CODE" />
+        </association>
     </resultMap>
 
     <select id="selectResultMapAssociationTest" resultMap="menuAndCategoryResultMap">

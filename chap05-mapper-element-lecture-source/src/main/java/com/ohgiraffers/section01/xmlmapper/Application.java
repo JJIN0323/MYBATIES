@@ -11,7 +11,7 @@ public class Application {
 
         do {
 
-            System.out.println("==============Mapper Element 테스트 메뉴============");
+            System.out.println("* Mapper Element 테스트 메뉴 *");
             System.out.println("1. <cache> 테스트");
             System.out.println("2. <resultMap> 서브 메뉴");
             System.out.println("3. <sql> 테스트");
@@ -40,7 +40,7 @@ public class Application {
 
         do {
 
-            System.out.println("================ResultMap 서브메뉴================");
+            System.out.println("* ResultMap 서브메뉴 *");
             System.out.println("1. <resultMap> 테스트");
             System.out.println("2. <constructor> 테스트");
             System.out.println("3. <association> 테스트");
